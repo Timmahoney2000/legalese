@@ -186,8 +186,11 @@ export default function Home() {
                 <span className="gold-accent"> Translator</span>
               </h1>
               <p className="text-xl text-legal-stone max-w-2xl mx-auto leading-relaxed">
-                Transform complex legal documents into clear, accessible language.
-                Free AI-powered translation with Black's Law Dictionary.
+                Understand Legal Documents — Without Being a Lawyer
+
+LawParse translates legal language into clear, plain English for professionals who work with contracts, policies, and agreements every day.
+
+If you’re not a lawyer but still expected to understand legal documents, LawParse helps you make sense of them before you escalate to legal counsel.
               </p>
             </div>
             
@@ -247,7 +250,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center text-legal-stone text-sm space-y-2">
             <p className="font-medium">
-              Built with Next.js, Tailwind CSS, Groq AI, and Black's Law Dictionary
+              Based on established legal definitions and publicly available legal sources.
             </p>
             <p className="text-xs opacity-70">
               Translations are AI-generated and should not be considered legal advice. 
