@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-legal-cream text-legal-navy font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .legal-pattern {
+    background-image: 
+      linear-gradient(30deg, #0A162810 12%, transparent 12.5%, transparent 87%, #0A162810 87.5%, #0A162810),
+      linear-gradient(150deg, #0A162810 12%, transparent 12.5%, transparent 87%, #0A162810 87.5%, #0A162810),
+      linear-gradient(30deg, #0A162810 12%, transparent 12.5%, transparent 87%, #0A162810 87.5%, #0A162810),
+      linear-gradient(150deg, #0A162810 12%, transparent 12.5%, transparent 87%, #0A162810 87.5%, #0A162810);
+    background-size: 80px 140px;
+    background-position: 0 0, 0 0, 40px 70px, 40px 70px;
+  }
+  
+  .document-shadow {
+    box-shadow: 
+      0 0 0 1px rgba(26, 26, 26, 0.05),
+      0 1px 2px 0 rgba(26, 26, 26, 0.05),
+      0 4px 8px 0 rgba(26, 26, 26, 0.08),
+      0 16px 32px 0 rgba(26, 26, 26, 0.12);
+  }
+  
+  .gold-accent {
+    background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-legal-cream;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-legal-stone rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-legal-navy;
+}
+
+/* Text selection */
+::selection {
+  @apply bg-legal-gold text-legal-navy;
+}

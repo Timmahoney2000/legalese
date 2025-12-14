@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "GROQ_API_KEY": {
+      "description": "Groq API Key (free at console.groq.com)",
+      "required": true
+    },
+    "RATE_LIMIT_MAX": {
+      "description": "Maximum translations per IP per day",
+      "value": "10",
+      "required": false
+    }
+  }
+}
