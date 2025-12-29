@@ -1,36 +1,56 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { extractLegalTerms, searchDictionaryByEmbedding } from '@/lib/dictionary';
 import { translateWithOpenAI } from '@/lib/openai';
-import { checkRateLimit, getClientIP, formatResetTime } from '@/lib/rateLimit';
+import { incrementUsage, getUsageStats } from '@/lib/users';
 
 export const runtime = 'edge';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    // Rate limiting
-    const clientIP = getClientIP(req);
-    const maxRequests = parseInt(process.env.RATE_LIMIT_MAX || '10');
-    const rateLimit = checkRateLimit(clientIP, maxRequests);
+    // Check authentication
+    const session = await getServerSession(authOptions);
     
-    if (!rateLimit.allowed) {
+    if (!session || !session.user?.email) {
       return NextResponse.json(
         {
-          error: 'Rate limit exceeded',
-          message: `You've reached the maximum of ${maxRequests} translations per day. Please try again in ${formatResetTime(rateLimit.resetTime)}.`,
-          resetTime: rateLimit.resetTime,
+          error: 'Authentication required',
+          message: 'Please sign in to use the translator.',
         },
-        { 
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': maxRequests.toString(),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
-          }
-        }
+        { status: 401 }
       );
     }
+
+    // Check usage limits
+    const usage = getUsageStats(session.user.email);
     
+    if (!usage) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if user has reached their limit
+    if (usage.limit !== 999999 && usage.used >= usage.limit) {
+      const resetDate = new Date(usage.resetDate).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+
+      return NextResponse.json(
+        {
+          error: 'Limit reached',
+          message: `You've reached your ${usage.plan.toLowerCase()} plan limit of ${usage.limit} translations. Your limit resets on ${resetDate}. Upgrade your plan for more translations.`,
+          upgradeUrl: '/pricing',
+        },
+        { status: 429 }
+      );
+    }
+
     const { documentText, fileName } = await req.json();
     
     if (!documentText || typeof documentText !== 'string') {
@@ -61,6 +81,19 @@ export async function POST(req: Request) {
       }
     }
     
+    // Increment usage count BEFORE translation
+    const incremented = incrementUsage(session.user.email);
+    
+    if (!incremented) {
+      return NextResponse.json(
+        {
+          error: 'Failed to update usage',
+          message: 'An error occurred. Please try again.',
+        },
+        { status: 500 }
+      );
+    }
+
     // Stream the translation using OpenAI
     const stream = await translateWithOpenAI({
       documentText,
@@ -68,13 +101,16 @@ export async function POST(req: Request) {
       definitions: definitionsContext,
     });
     
+    // Get updated usage stats
+    const updatedUsage = getUsageStats(session.user.email);
+    
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
-        'X-RateLimit-Limit': maxRequests.toString(),
-        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
-        'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
+        'X-Usage-Used': updatedUsage?.used.toString() || '0',
+        'X-Usage-Limit': updatedUsage?.limit.toString() || '0',
+        'X-Usage-Plan': updatedUsage?.plan || 'FREE',
       },
     });
     
