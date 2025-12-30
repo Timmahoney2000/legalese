@@ -5,6 +5,7 @@ import { extractLegalTerms, searchDictionaryByEmbedding } from '@/lib/dictionary
 import { translateWithOpenAI } from '@/lib/openai';
 import { incrementUsage, getUsageStats } from '@/lib/users';
 
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
