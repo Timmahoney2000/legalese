@@ -1,5 +1,5 @@
 import type { User, UsageStats } from '@/types';
-import { PLANS, type PlanType } from './stripe';
+import { PLANS, type PlanType } from './plans';
 
 // In-memory user storage (replace with database later)
 const users = new Map<string, User>();
