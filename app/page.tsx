@@ -119,6 +119,14 @@ const translateDocument = async (text: string, name: string) => {
       
       throw new Error(error.error || 'Failed to translate document');
     }
+
+    const handleReset = () => {
+  setDocumentText('');
+  setTranslatedText('');
+  setFileName('');
+  setIsProcessing(false);
+  setIsTranslating(false);
+};
     
     // Update usage stats from headers
     const usageUsed = response.headers.get('X-Usage-Used');
@@ -158,6 +166,14 @@ const translateDocument = async (text: string, name: string) => {
   } finally {
     setIsTranslating(false);
   }
+};
+
+const handleReset = () => {
+  setDocumentText('');
+  setTranslatedText('');
+  setFileName('');
+  setIsProcessing(false);
+  setIsTranslating(false);
 };
   
   return (

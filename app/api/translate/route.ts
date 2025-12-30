@@ -5,8 +5,6 @@ import { extractLegalTerms, searchDictionaryByEmbedding } from '@/lib/dictionary
 import { translateWithOpenAI } from '@/lib/openai';
 import { incrementUsage, getUsageStats } from '@/lib/users';
 
-export const runtime = 'edge';
-export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {

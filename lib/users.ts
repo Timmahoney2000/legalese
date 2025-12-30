@@ -53,10 +53,11 @@ export function incrementUsage(email: string): boolean {
     user.translationsResetDate = getNextResetDate();
   }
   
-  const plan = PLANS[user.plan];
-  const limit = user.plan === 'FREE' 
-    ? plan.translationsPerDay 
-    : plan.translationsPerMonth;
+ const limit = user.plan === 'FREE'
+ ? PLANS.FREE.translationsPerDay
+ : user.plan === 'PRO'
+ ? PLANS.PRO.translationsPerMonth
+ : PLANS.BUSINESS.translationsPerMonth;
   
   // Business plan has unlimited (-1)
   if (limit === -1 || user.translationsUsed < limit) {
@@ -74,8 +75,10 @@ export function getUsageStats(email: string): UsageStats | null {
   
   const plan = PLANS[user.plan];
   const limit = user.plan === 'FREE'
-    ? plan.translationsPerDay
-    : plan.translationsPerMonth;
+    ? PLANS.FREE.translationsPerDay
+    : user.plan === 'PRO'
+    ? PLANS.PRO.translationsPerMonth
+    : PLANS.BUSINESS.translationsPerMonth;
   
   return {
     used: user.translationsUsed,

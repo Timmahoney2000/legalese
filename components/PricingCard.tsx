@@ -6,7 +6,7 @@ interface PricingCardProps {
   name: string;
   price: number;
   priceId?: string;
-  features: string[];
+  features: readonly string[];
   isPopular?: boolean;
   isCurrentPlan?: boolean;
 }
