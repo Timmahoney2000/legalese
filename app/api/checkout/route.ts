@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { stripe, PLANS } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
+import { PLANS } from '@/lib/plans';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
