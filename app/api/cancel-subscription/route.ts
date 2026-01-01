@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const session = await ggetServerSession(authOptions);
+        const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.email) {
             return NextResponse.json(
@@ -20,7 +20,7 @@ export async function GET() {
         const actualPlan = await getUserPlanFromStripe(session.user.email);
 
         // Update local user with actual plan
-        const user = createOrgetUser(session.user.email);
+        const user = createOrGetUser(session.user.email);
         user.plan = actualPlan;
 
         const usage = getUsageStats(session.user.email);
