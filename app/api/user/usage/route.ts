@@ -16,6 +16,15 @@ export async function GET() {
       );
     }
 
+    // TEMPORARY TEST - FORCE RETURN PRO
+    return NextResponse.json({
+      used: 0,
+      limit: 100,
+      resetDate: new Date(),
+      plan: 'PRO',
+      test: 'FORCED PRO RESPONSE'
+    });
+
     const usage = getUsageStats(session.user.email);
 
     if (!usage) {
