@@ -1,5 +1,7 @@
 import type { User, UsageStats } from '@/types';
 import { PLANS, type PlanType } from './plans';
+import { stripe } from './stripe';
+import { getPlanByPriceId } from './stripe';
 
 // In-memory user storage (replace with database later)
 const users = new Map<string, User>();
@@ -53,11 +55,11 @@ export function incrementUsage(email: string): boolean {
     user.translationsResetDate = getNextResetDate();
   }
   
- const limit = user.plan === 'FREE'
- ? PLANS.FREE.translationsPerDay
- : user.plan === 'PRO'
- ? PLANS.PRO.translationsPerMonth
- : PLANS.BUSINESS.translationsPerMonth;
+  const limit = user.plan === 'FREE'
+    ? PLANS.FREE.translationsPerDay
+    : user.plan === 'PRO'
+    ? PLANS.PRO.translationsPerMonth
+    : PLANS.BUSINESS.translationsPerMonth;
   
   // Business plan has unlimited (-1)
   if (limit === -1 || user.translationsUsed < limit) {
@@ -73,7 +75,6 @@ export function getUsageStats(email: string): UsageStats | null {
   const user = users.get(email);
   if (!user) return null;
   
-  const plan = PLANS[user.plan];
   const limit = user.plan === 'FREE'
     ? PLANS.FREE.translationsPerDay
     : user.plan === 'PRO'
@@ -86,6 +87,42 @@ export function getUsageStats(email: string): UsageStats | null {
     resetDate: user.translationsResetDate,
     plan: user.plan,
   };
+}
+
+export async function getUserPlanFromStripe(email: string): Promise<PlanType> {
+  try {
+    // Search for customer by email
+    const customers = await stripe.customers.list({
+      email: email,
+      limit: 1,
+    });
+
+    if (customers.data.length === 0) {
+      return 'FREE';
+    }
+
+    const customer = customers.data[0];
+
+    // Get active subscriptions
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: 'active',
+      limit: 1,
+    });
+
+    if (subscriptions.data.length === 0) {
+      return 'FREE';
+    }
+
+    // Get the price ID from the subscription
+    const priceId = subscriptions.data[0].items.data[0].price.id;
+    const plan = getPlanByPriceId(priceId);
+
+    return plan || 'FREE';
+  } catch (error) {
+    console.error('Error fetching plan from Stripe:', error);
+    return 'FREE';
+  }
 }
 
 function getNextResetDate(): Date {

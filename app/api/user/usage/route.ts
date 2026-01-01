@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getUsageStats } from '@/lib/users';
+import { getUsageStats, getUserPlanFromStripe, createOrGetUser } from '@/lib/users';
 
 export const dynamic = 'force-dynamic';
 
