@@ -1,67 +1,42 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { stripe } from '@/lib/stripe';
+import { getUsageStats, getUserPlanFromStripe, createOrGetUser } from '@/lib/users';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST() {
+export async function GET() {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await ggetServerSession(authOptions);
 
         if (!session || !session.user?.email) {
             return NextResponse.json(
-                { error: 'Unauthorized' },
+                { error: 'Unauthaurized' },
                 { status: 401 }
             );
         }
 
-        // Find customer by email
-        const customers = await stripe.customers.list({
-            email: session.user.email,
-            limit: 1,
-        });
+        // Get plan from Stripe 
+        const actualPlan = await getUserPlanFromStripe(session.user.email);
 
-        if (customers.data.length === 0) {
+        // Update local user with actual plan
+        const user = createOrgetUser(session.user.email);
+        user.plan = actualPlan;
+
+        const usage = getUsageStats(session.user.email);
+
+        if (!usage) {
             return NextResponse.json(
-                { error: 'No subscription found' },
+                { error: 'User not found' },
                 { status: 404 }
             );
         }
 
-        const customer = customers.data[0];
-
-        // Get active subscriptions
-        const subscriptions = await stripe.subscriptions.list({
-            customer: customer.id,
-            status: 'active',
-            limit: 1,
-        });
-
-        if (subscriptions.data.length === 0) {
-            return NextResponse.json(
-                { error: 'No active subscription found' },
-                { status: 404 }
-            );
-        }
-
-        // Cancel the subscription at period end (so they keep access until paid period ends)
-        const subscription = await stripe.subscriptions.update(
-            subscriptions.data[0].id,
-            {
-                cancel_at_period_end: true,
-            }
-        );
-
-        return NextResponse.json({
-            success: true,
-            message: 'Subscription will cancel at the end of your billing period',
-            cancelAt: subscription.cancel_at,
-        });
+        return NextResponse.json(usage);
     } catch (error) {
-        console.error('Cancel subscription error:', error);
+        console.error('Usage stats error:', error);
         return NextResponse.json(
-            { error: 'Failed to cancel subscriptions' },
+            { error: 'Failed to get usage stats' },
             { status: 500 }
         );
     }
