@@ -39,6 +39,32 @@ export default function DashboardPage() {
     }
   };
 
+const handleCancelSubscription = async () => {
+  if (!confirm('Are you sure you want to cancel your subscription? You\'ll keep access until the end of your billing period.')) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/cancel-subscription', {
+      method: 'POST',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to cancel subscription');
+    }
+
+    alert('Subscription canceled. You\'ll keep access until the end of your billing period');
+
+    // Refresh usage data
+    fetchUsage();
+  } catch (error) {
+    console.error('Cancel error:', error);
+    alert(error instanceof Error ? error.message : 'Failed to cancel subscription');
+  }
+};
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-legal-cream flex items-center justify-center">
@@ -111,14 +137,21 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {usage.plan === 'FREE' && (
-              <a
-                href="/pricing"
-                className="block w-full py-3 bg-legal-gold text-legal-navy text-center rounded-lg font-semibold hover:bg-legal-gold/90 transition-colors"
-              >
-                Upgrade Plan
-              </a>
-            )}
+           {usage.plan === 'FREE' ? (
+
+            <a href="/pricing"
+            className="block w-full py-3 bg-legal-gold text-legal-navy text-center rounded-lg font-semibold hover:bg-legal-gold/90 transition-colors"
+            >
+              Upgrade Plan
+            </a>
+           ) : (
+            <button
+            onClick={handleCancelSubscription}
+            className="block w-full py-3 bg-red-50 text-red-700 border-2 border-red-200 text-center rounded-lg font-semibold hover:bg-red-100 transition-colors"
+            >
+            Cancel Subscription
+            </button>
+           )}
           </div>
 
           {/* Usage Stats */}
