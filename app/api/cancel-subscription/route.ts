@@ -3,11 +3,22 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 
-export const dynamic = 'force-dynamnic';
-
 export async function POST() {
     try {
         const session = await getServerSession(authOptions);
+
+        if (!session || !session.user?.email) {
+            return NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 401 }
+        );
+        }
+
+        // Find customer by email
+        const customers = await stripe.customers.list({
+            email: session.user.email,
+            limit: 1,
+        });
 
         if (customers.data.length === 0) {
             return NextResponse.json(
@@ -31,6 +42,7 @@ export async function POST() {
                 { status: 404 }
             );
         }
+
         // Cancel the subscription at period end
         const subscription = await stripe.subscriptions.update(
             subscriptions.data[0].id,
@@ -48,7 +60,7 @@ export async function POST() {
         console.error('Cancel subscription error:', error);
         return NextResponse.json(
             { error: 'Failed to cancel subscription' },
-            { status: 500 }
+            { status: 500}
         );
     }
 }
