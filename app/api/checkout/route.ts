@@ -23,32 +23,34 @@ export async function POST(req: Request) {
         { status: 400 }
       );
 
-      // Check for existing subscription
-      const existingCustomers = await stripe.customers.list({
-        email: session.user.email!,
-        limit: 1,
-      });
+  // check for existing subscription
+  const userEmail = session.user.email!;
 
-      if (existingCustomers.data.length > 0) {
-        const customer = existingCustomers.data[0];
+  const existingCustomers = await stripe.customers.list({
+    email: userEmail,
+    limit: 1,
+  });
 
-        // Check for active subscriptions
-        const activeSubscriptions = await stripe.subscriptions.list({
-          customer: customer.id,
-          status: 'active',
-          limit: 1,
-        });
+  if (existingCustomers.data.length > 0) {
+    const customer = existingCustomers.data[0];
 
-        if (activeSubscriptions.data.length > 0) {
-          return NextResponse.json(
-            {
-              error: 'You already have an active subscription. Please cancel your current subscription before upgrading.',
-              redirectUrl: '/dashboard'
-            },
-            { status: 400 }
-          );
-        }
-      }
+    // Check for active subscriptions
+    const activeSubscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: 'active',
+      limit: 1,
+    });
+
+    if (activeSubscriptions.data.length > 0) {
+      return NextResponse.json(
+        {
+          error: 'You already have an active subscription. Please cancel you current subscription before upgrading.',
+          redirectUrl: '/dashboard'
+        },
+        { status: 400 }
+      );
+    }
+  }
     }
 
     const plan = PLANS[planType];
