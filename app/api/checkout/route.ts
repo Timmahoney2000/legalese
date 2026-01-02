@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
       // Check for existing subscription
       const existingCustomers = await stripe.customers.list({
-        email: session.user.email,
+        email: session.user.email!,
         limit: 1,
       });
 
