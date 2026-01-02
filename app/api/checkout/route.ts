@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const plan = PLANS[planType];
+    const plan = PLANS[planType as 'PRO' || 'BUSINESS'];
     
     if (!plan.priceId) {
       return NextResponse.json(
