@@ -114,16 +114,16 @@ export default function PricingCard({
 
    <button
    onClick={handleSubscribe}
-   disabled={isLoading || isCurrenPlan}
+   disabled={loading || isCurrentPlan}
    className={`w-full py-3 rounded-lg font-semibold transition-colors ${
     isCurrentPlan
     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
     : isPopular
     ? 'bg-legal-gold text-legal-navy hover:bg-legal-gold/90'
     : 'bg-legal-navy text-white hover:bg-legal-navy/90'
-   } ${isLoading ? 'opacity-50 cursor-wait' : ''}`}
+   } ${loading ? 'opacity-50 cursor-wait' : ''}`}
    >
-    {isLoading ? 'Processing...' : isCurrentPlan ? 'Current Plan' : 'Subscribe Now'}
+    {loading ? 'Processing...' : isCurrentPlan ? 'Current Plan' : 'Subscribe Now'}
    </button>
     </div>
   );
