@@ -22,43 +22,43 @@ export async function POST(req: Request) {
         { error: 'Invalid plan type' },
         { status: 400 }
       );
+    }
 
-  // check for existing subscription
-  const userEmail = session.user.email!;
-
-  const existingCustomers = await stripe.customers.list({
-    email: userEmail,
-    limit: 1,
-  });
-
-  if (existingCustomers.data.length > 0) {
-    const customer = existingCustomers.data[0];
-
-    // Check for active subscriptions
-    const activeSubscriptions = await stripe.subscriptions.list({
-      customer: customer.id,
-      status: 'active',
+    // Check for existing subscription
+    const userEmail = session.user.email;
+    
+    const existingCustomers = await stripe.customers.list({
+      email: userEmail,
       limit: 1,
     });
 
-    if (activeSubscriptions.data.length > 0) {
-      return NextResponse.json(
-        {
-          error: 'You already have an active subscription. Please cancel you current subscription before upgrading.',
-          redirectUrl: '/dashboard'
-        },
-        { status: 400 }
-      );
-    }
-  }
+    if (existingCustomers.data.length > 0) {
+      const customer = existingCustomers.data[0];
+      
+      // Check for active subscriptions
+      const activeSubscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: 'active',
+        limit: 1,
+      });
+
+      if (activeSubscriptions.data.length > 0) {
+        return NextResponse.json(
+          { 
+            error: 'You already have an active subscription. Please cancel your current subscription before upgrading.',
+            redirectUrl: '/dashboard'
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const plan = PLANS[planType];
-
+    
     if (!plan.priceId) {
       return NextResponse.json(
-      { error: 'Plan not configured' },
-      { status: 400 }
+        { error: 'Plan not configured' },
+        { status: 400 }
       );
     }
 
@@ -74,8 +74,9 @@ export async function POST(req: Request) {
       ],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/pricing?canceled=true`,
+      customer_email: session.user.email,
       metadata: {
-        userEmail: session.user.email!,
+        userEmail: session.user.email,
         planType,
       },
     });
@@ -91,8 +92,8 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Checkout error:', error);
     return NextResponse.json(
-    { error: 'Failed to start checkout' },
-    { status: 500 }
+      { error: 'Failed to start checkout' },
+      { status: 500 }
     );
-}
+  }
 }
