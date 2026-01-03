@@ -316,16 +316,7 @@ Outputs are informational only and should not be considered legal advice."
               Translations are AI-generated and should not be considered legal advice. 
               Consult a qualified attorney for legal matters.
             </p>
-            <div className="pt-4">
-              <a 
-                href="https://github.com/yourusername/legal-translator" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-legal-blue hover:underline text-sm"
-              >
-                View on GitHub →
-              </a>
-            </div>
+           
           </div>
         </div>
       </footer>

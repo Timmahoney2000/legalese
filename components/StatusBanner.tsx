@@ -39,12 +39,10 @@ export default function StatusBanner({ status, onRefresh }: StatusBannerProps) {
             
             {!groq.configured && (
               <div className="mb-3">
-                <p className="text-sm text-yellow-800 mb-2">
-                  <strong>❌ Groq API key not configured</strong>
-                </p>
+                
                 <ol className="text-sm text-yellow-700 space-y-1 ml-4 list-decimal">
                   <li>Get free API key at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">console.groq.com</a></li>
-                  <li>Add GROQ_API_KEY to .env.local</li>
+                 
                   <li>Restart the dev server</li>
                 </ol>
               </div>

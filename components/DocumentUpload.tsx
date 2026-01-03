@@ -107,11 +107,8 @@ export default function DocumentUpload({ onUpload, isProcessing, disabled }: Doc
               </svg>
             </div>
             <h3 className="font-serif text-2xl font-semibold text-legal-navy mb-2">
-              Setup Required
+              Loading...
             </h3>
-            <p className="text-legal-stone">
-              Please add your Groq API key to .env.local
-            </p>
           </div>
         ) : (
           <>
