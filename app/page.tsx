@@ -313,8 +313,7 @@ Outputs are informational only and should not be considered legal advice."
               Based on established legal definitions and publicly available legal sources.
             </p>
             <p className="text-xs opacity-70">
-              Translations are AI-generated and should not be considered legal advice. 
-              Consult a qualified attorney for legal matters.
+              Disclaimer: LawParse.com provides information for educational purposes only and does not offer legal advice. Use of this site does not create an attorney-client relationship. Always consult a qualified legal professional regarding your specific situation.
             </p>
            
           </div>
