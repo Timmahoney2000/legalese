@@ -90,9 +90,6 @@ export function getUsageStats(email: string): UsageStats | null {
 }
 
 export async function getUserPlanFromStripe(email: string): Promise<PlanType> {
-
-  console.log('=== getUserPlanFromStripe called ===');
-  console.log('Email:', email);
   try {
     // Search for customer by email
     const customers = await stripe.customers.list({
@@ -105,7 +102,6 @@ export async function getUserPlanFromStripe(email: string): Promise<PlanType> {
     }
 
     const customer = customers.data[0];
-    console.log('Customer ID:', customer.id);
 
     // Get active subscriptions
     const subscriptions = await stripe.subscriptions.list({
@@ -114,21 +110,13 @@ export async function getUserPlanFromStripe(email: string): Promise<PlanType> {
       limit: 1,
     });
 
-    console.log('Active subscriptions found:', subscriptions.data.length);
-
     if (subscriptions.data.length === 0) {
-      console.log('No active subscription - returning FREE');
       return 'FREE';
     }
 
     // Get the price ID from the subscription
     const priceId = subscriptions.data[0].items.data[0].price.id;
-    console.log('Price ID from subscription:', priceId);
-    console.log('Expected Pro Price:', process.env.STRIPE_PRICE_ID_PRO);
-    console.log('Expected Business Price:', process.env.STRIPE_PRICE_ID_BUSINESS);
-
     const plan = getPlanByPriceId(priceId);
-    console.log('Matched plan:', plan);
 
     return plan || 'FREE';
   } catch (error) {
