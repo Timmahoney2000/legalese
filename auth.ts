@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
-import { createOrGetUser } from './lib/users.js';
+import { createOrGetUser } from '@/lib/users';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
