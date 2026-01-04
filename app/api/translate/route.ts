@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { extractLegalTerms, searchDictionaryByEmbedding } from '@/lib/dictionary';
 import { translateWithOpenAI } from '@/lib/openai';
 import { incrementUsage, getUsageStats } from '@/lib/users';
@@ -10,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     // Check authentication
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     
     if (!session || !session.user?.email) {
       return NextResponse.json(
