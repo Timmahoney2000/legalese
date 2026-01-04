@@ -39,31 +39,31 @@ export default function DashboardPage() {
     }
   };
 
-const handleCancelSubscription = async () => {
-  if (!confirm('Are you sure you want to cancel your subscription? You\'ll keep access until the end of your billing period.')) {
-    return;
-  }
-
-  try {
-    const response = await fetch('/api/cancel-subscription', {
-      method: 'POST',
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to cancel subscription');
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You\'ll keep access until the end of your billing period.')) {
+      return;
     }
 
-    alert('Subscription canceled. You\'ll keep access until the end of your billing period');
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+      });
 
-    // Refresh usage data
-    fetchUsage();
-  } catch (error) {
-    console.error('Cancel error:', error);
-    alert(error instanceof Error ? error.message : 'Failed to cancel subscription');
-  }
-};
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to cancel subscription');
+      }
+
+      alert('Subscription canceled. You\'ll keep access until the end of your billing period.');
+
+      // Redirect to home page
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Cancel error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to cancel subscription');
+    }
+  };
 
   if (status === 'loading' || loading) {
     return (
